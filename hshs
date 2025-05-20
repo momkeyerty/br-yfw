@@ -1,0 +1,60 @@
+<!DOCTYPE html><html>
+  <head>
+    <title>VR Tagging Game</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/networked-aframe@0.9.1/dist/networked-aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene networked-scene>
+      <a-assets>
+        <template id="avatar-template">
+          <a-entity>
+            <a-box color="#4CC3D9" depth="0.5" height="1.5" width="0.5"></a-box>
+          </a-entity>
+        </template>
+      </a-assets><!-- Camera Rig -->
+  <a-entity id="rig" position="0 1.6 0">
+    <a-camera wasd-controls look-controls position="0 0 0"></a-camera>
+    <a-entity laser-controls="hand: right"></a-entity>
+  </a-entity>
+
+  <!-- Networked Avatar -->
+  <a-entity id="player" networked="template:#avatar-template;attachTemplateToLocal:true"></a-entity>
+
+  <!-- Ground -->
+  <a-plane position="0 0 -4" rotation="-90 0 0" width="20" height="20" color="#7BC8A4"></a-plane>
+
+  <!-- Obstacles -->
+  <a-box position="-1 0.5 -3" depth="1" height="1" width="1" color="#FFC65D"></a-box>
+  <a-box position="2 0.5 -5" depth="1" height="1" width="1" color="#7BC8A4"></a-box>
+
+  <!-- Lighting -->
+  <a-light type="directional" position="0 5 5" intensity="1"></a-light>
+
+  <!-- Tagging Logic -->
+  <script>
+    AFRAME.registerComponent('tag-handler', {
+      init: function () {
+        const el = this.el;
+        el.addEventListener('collide', (e) => {
+          if (el.classList.contains('it')) {
+            const other = e.detail.body.el;
+            if (!other.classList.contains('it')) {
+              el.classList.remove('it');
+              other.classList.add('it');
+              console.log('Player tagged!');
+            }
+          }
+        });
+      }
+    });
+
+    document.querySelector('#player').setAttribute('tag-handler', '');
+    document.querySelector('#player').classList.add('it');
+  </script>
+</a-scene>
+
+  </body>
+</html>
